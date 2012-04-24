@@ -1,0 +1,22 @@
+{
+  "name": "nap",
+  "version": "0.0.1",
+  "author": "Charles Jolley",
+  "description": "Pluggable, package-aware asset pipeline for node",
+
+  "dependencies": {
+    "async": "latest",
+    "resolve": "latest"
+  },
+
+  "devDependencies": {
+    "should": "latest",
+    "mocha": "latest",
+    "dox": "latest",
+    "temp": "latest"
+  },
+
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --reporter list"
+  }
+}

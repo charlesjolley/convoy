@@ -1,0 +1,33 @@
+
+bpm add/remove
+  - modify package.json
+  - update installed packages via NPM
+  - rebuild project (if needed)
+
+- each package exposes plugins. adding as a dependency or devDependency will activate the plugin when building for your specific project.
+
+- package aware build system. Let's you import tasks by making a project a 
+  dependency
+
+- Each package gets its own execution context. Automatically requires bpmlibs to get tasks.
+
+bpm_libs.js: File {
+  files: [...] // other files with a prefix/postfix/body/modules. can flatten.
+  prefix: [...] // content to prefix ahead of everything else
+  postfix: [...] // content to add to end of everything.
+  body: [...] // body
+  modules: [...] // modules, which will be processed into the body at the end.
+}
+
+"bpm:scripts": {
+  "build": "bpm run-task build"
+}
+
+bpm jake FOO - Just like running Jake but loads tasks from dependencies automatically.
+
+pjake - package-aware version of Jake. Automatically loads any tasklibs in dependent packages. 
+
+// makes exports for these directories/files visible in the current runtime.
+"jakelibs": ["jakelibs", "Jakefile"]
+
+// pipeline...
