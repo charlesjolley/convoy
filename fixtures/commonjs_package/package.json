@@ -1,0 +1,4 @@
+{
+  "name": "commonjs_package",
+  "main": "./lib/index.js"
+}

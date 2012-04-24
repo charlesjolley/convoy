@@ -6,6 +6,7 @@
 var path = require('path');
 var fs   = require('fs');
 var temp = require('temp');
+var UGLIFY = require('uglify-js');
 
 var DIRNAME       = path.dirname(module.filename);
 var FIXTURES_PATH = path.resolve(DIRNAME, '..', 'fixtures');
@@ -56,3 +57,15 @@ exports.tmpfile = function() {
 
   return path.resolve.apply(path, args);
 };
+
+exports.uglify = function(text, options) {
+  if (!options) options = {};
+  var pro = UGLIFY.uglify;
+  var ast = UGLIFY.parser.parse(text);
+
+  ast = pro.ast_mangle(ast, options);
+  ast = pro.ast_squeeze(ast, options);
+  return pro.gen_code(ast, options);
+};
+
+

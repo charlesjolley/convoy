@@ -145,4 +145,45 @@ describe('[unit] asset_packager', function() {
   });
 
 
+  describe('[minifier]', function() {
+
+    it("should minify when activated", function(done) {
+      var expected = 
+        h.uglify(h.loadEach('test_module.js', 'test_module_2.js').join("\n"));
+
+      packager({
+        main: [h.fixture('test_module.js'), h.fixture('test_module_2.js')],
+        minify: true
+      }).build(function(err, asset) {
+        if (err) return done(err);
+        asset.body.should.equal(expected);
+        done();
+      });
+    });
+
+    it("should respect uglify options", function(done) {
+
+      var options = {
+        beautify: true,
+        toplevel: true
+      };
+
+      var expected = 
+        h.uglify(h.loadEach('test_module.js', 'test_module_2.js').join("\n"),
+          options);
+
+      packager({
+        main: [h.fixture('test_module.js'), h.fixture('test_module_2.js')],
+        minify: options
+      }).build(function(err, asset) {
+        if (err) return done(err);
+        asset.body.should.equal(expected);
+        done();
+      });
+    });
+
+  });
+
+
+
 });

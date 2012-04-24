@@ -6,7 +6,8 @@
 
   "dependencies": {
     "async": "latest",
-    "resolve": "latest"
+    "resolve": "latest",
+    "uglify-js":  "latest"
   },
 
   "devDependencies": {
