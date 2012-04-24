@@ -185,5 +185,17 @@ describe('[unit] asset_packager', function() {
   });
 
 
+  // this scenario can happen because of how node_modules are stored - if two
+  // packages depend on the same package, then the package can appear more than
+  // once in the system.
+  // 
+  // The solution to this is to recognize when the same asset is loaded more
+  // than once and then remove exact duplicates from the expanded set of 
+  // assets. If we can't remove exact duplicates, then both files remain but 
+  // are noted as a conflict. By default conflicting assets are both included
+  // though some plugins (like the CommonJS module system) may be more 
+  // intelligent about it.
+  // 
+  describe('[conflicting dependencies]');
 
 });

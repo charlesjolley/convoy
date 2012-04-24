@@ -53,6 +53,7 @@ describe('[unit] module_packager', function() {
       minify: true
     }).build(function(err, asset) {
       if (err) return done(err);
+      console.log('SIZE: '+ asset.body.length);
       asset.body.should.equal(expected);
       done();
     });

@@ -2,3 +2,4 @@
 
 require('./unit/asset_packager_test');
 require('./unit/module_packager_test');
+require('./unit/loader_test');
