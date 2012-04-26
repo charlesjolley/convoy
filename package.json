@@ -1,14 +1,13 @@
 {
-  "name": "nap",
-  "version": "0.0.1",
+  "name": "convoy",
+  "version": "0.1.0",
   "author": "Charles Jolley",
   "description": "Pluggable, package-aware asset pipeline for node",
 
   "dependencies": {
     "async": "latest",
     "resolve": "latest",
-    "uglify-js":  "latest",
-    "fsutil": "latest"
+    "uglify-js":  "latest"
   },
 
   "devDependencies": {
