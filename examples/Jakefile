@@ -1,13 +1,13 @@
-// example Jakefile using napipe.
+// example Jakefile using convoy.
 
-var napipe = require('./lib');
+var convoy = require('./lib');
 var path   = require('path');
 
 var MODE = env.MODE || 'debug';
 var BUILD_DIR = path.resolve(env.BUILD_DIR || 'public');
 
 
-var pipeline = napipe({
+var pipeline = convoy({
   'javascripts/app.js': {
     type: 'javascript',
     main: './app/main.js',
