@@ -1,13 +1,26 @@
 {
   "name": "convoy",
-  "version": "0.1.0",
-  "author": "Charles Jolley",
+  "version": "0.1.1",
+  "author": "Charles Jolley <charles@sproutcore.com>",
   "description": "Pluggable, package-aware asset pipeline for node",
+  "keywords": ["asset", "pipeline", "connect", "jake", "build", "tools"],
+
+  "homepage": "http://github.com/charlesjolley/convoy",
+  "bugs": {
+    "url": "http://github.com/charlesjolley/convoy/issues"
+  },
+
+  "repository": {
+    "type": "git",
+    "url":  "http://github.com/charlesjolley/convoy.git"  
+  },
+
+  "main": "./lib/index.js",
 
   "dependencies": {
-    "async": "latest",
-    "resolve": "latest",
-    "uglify-js":  "latest"
+    "async": "0.1.x",
+    "resolve": "0.2.x",
+    "uglify-js":  "~1.2"
   },
 
   "devDependencies": {
