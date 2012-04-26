@@ -1,0 +1,8 @@
+/**
+ * @module sample_app/styles/models
+ */
+
+.person {
+  color: green;
+  font-size: 14px;
+}

@@ -1,5 +1,6 @@
 // loader for tests
 
 require('./unit/asset_packager_test');
-require('./unit/module_packager_test');
+require('./unit/commonjs_packager_test');
 require('./unit/loader_test');
+require('./unit/pipeline_test');

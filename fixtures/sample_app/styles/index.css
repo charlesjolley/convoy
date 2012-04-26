@@ -1,0 +1,11 @@
+/**
+ * @module sample_app/styles/index
+ */
+
+/*= require ./bootstrap/styles */
+/*= require ./global */
+/*= require ./models */
+
+h1 {
+  color: red;
+}

@@ -3,9 +3,20 @@
  */
 
 var should   = require('should');
-var packager = require('../../lib/asset_packager');
 var FS       = require('fs');
 var h  = require('../helpers');
+var lib = h.lib;
+
+function packager(config) {
+  return new lib.AssetPackager({
+    compilers: {
+      '.js': lib.plugins.GenericCompiler
+    },
+    analyzer: lib.plugins.GenericAnalyzer,
+    linker:   lib.plugins.SimpleMergeLinker,
+    minifier: lib.plugins.UglifyMinifier
+  }, config);
+}
 
 describe('[unit] asset_packager', function() {
 
@@ -57,7 +68,7 @@ describe('[unit] asset_packager', function() {
 
     it("should write out contents", function(done) {
       var tmpfile = h.tmpfile();
-      inst.write(tmpfile, function(err) {
+      inst.writeFile(tmpfile, function(err) {
         if (err) return done(err);
         FS.readFileSync(tmpfile, 'utf8').should.equal(expected);
         done();
@@ -66,11 +77,11 @@ describe('[unit] asset_packager', function() {
 
     it("should write out contents on each call", function(done) {
       var tmpfile = h.tmpfile();
-      inst.write(tmpfile, function(err) {
+      inst.writeFile(tmpfile, function(err) {
         if (err) return done(err);
         var expected = FS.readFileSync(tmpfile, 'utf8');
         FS.writeFileSync(tmpfile, "DUMMY"); // make sure write happens again
-        inst.write(tmpfile, function(err) {
+        inst.writeFile(tmpfile, function(err) {
           if (err) return done(err);
           FS.readFileSync(tmpfile, 'utf8').should.equal(expected);
           done();
@@ -196,6 +207,35 @@ describe('[unit] asset_packager', function() {
   // though some plugins (like the CommonJS module system) may be more 
   // intelligent about it.
   // 
-  describe('[conflicting dependencies]');
+  it("should gracefully handle conflicting dependencies", function(done) {
+    var expected = h.loadEach(
+      'demo_package/node_modules/uses_conflicting_package/node_modules/conflicting_package/identical_file.js',
+      'demo_package/node_modules/uses_conflicting_package/node_modules/conflicting_package/conflicting_file.js',
+      'demo_package/node_modules/uses_conflicting_package/main.js',
+
+      // this file is required but is identical and therefore should be 
+      // omitted
+      //'demo_package/node_modules/conflicting_package/identical_file.js',
+
+      // this file is required twice but conflicts so it shoudl appear.
+      'demo_package/node_modules/conflicting_package/conflicting_file.js',
+      'demo_package/conflict_test.js').join("\n");
+
+    var inst = packager({
+      main: h.fixture('demo_package/conflict_test.js')
+    });
+
+    var log = h.captureLog(inst); // listen for logging events
+
+    inst.build(function(err, asset) {
+      if (err) return done(err);
+      should.exist(log.warnings[0]);
+      log.warnings[0].should.match(/conflict/); // should log a conflict
+      asset.body.should.equal(expected);
+      done();
+    });
+  });
 
 });
+
+

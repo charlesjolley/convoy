@@ -58,6 +58,20 @@ exports.tmpfile = function() {
   return path.resolve.apply(path, args);
 };
 
+/**
+ * Ensures the passed directories exist, creating them if needed
+ */
+exports.mkdirSync_p = function(p) {
+  if (path.existsSync(p)) {
+    if (!fs.statSync(p).isDirectory()) {
+      throw new Error(p + ' is not a directory');
+    }
+  } else {
+    this.mkdirSync_p(path.dirname(p));
+    fs.mkdirSync(p);
+  }
+};
+
 exports.uglify = function(text, options) {
   if (!options) options = {};
   var pro = UGLIFY.uglify;
@@ -66,6 +80,21 @@ exports.uglify = function(text, options) {
   ast = pro.ast_mangle(ast, options);
   ast = pro.ast_squeeze(ast, options);
   return pro.gen_code(ast, options);
+};
+
+// listens to an event emitter that puts out warn, info, and error events.
+exports.captureLog = function(eventEmitter) {
+  var ret = {
+    warnings: [],
+    info:     [],
+    errors:   []
+  };
+
+  eventEmitter.on('warn',  function(line) { ret.warnings.push(line); });
+  eventEmitter.on('error', function(line) { ret.errors.push(line); });
+  eventEmitter.on('info',  function(line) { ret.info.push(line); });
+
+  return ret;
 };
 
 
