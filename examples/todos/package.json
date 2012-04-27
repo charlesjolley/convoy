@@ -1,0 +1,13 @@
+{
+  "name": "todos",
+  "version": "1.0.0",
+  "dependencies": {
+    "convoy": "latest",
+    "underscore": "latest",
+    "convoy-jquery": "latest",
+    "backbone": "latest"
+  },
+
+  "main": "./app/main.js",
+  "private": true
+}

@@ -1,0 +1,45 @@
+
+
+var path = require('path');
+var pipeline = require('convoy')({
+
+  'app.js': {
+    type: 'javascript',
+    main: path.resolve(module.filename, '../app/main.js'),
+    minify: process.env.MODE === 'production'
+  },
+
+  'app.css': {
+    type: 'css',
+    main: path.resolve(module.filename, '../app/styles')
+  },
+
+  'assets': {
+    type: 'copy',
+    root: 'app/assets'
+  }
+
+});
+
+pipeline.logger = console;
+
+var BUILDDIR = path.resolve(module.filename, '../public');
+
+task('build', function() {
+  jake.rmRf(BUILDDIR);
+  pipeline.writeAll(BUILDDIR, complete);
+}, { async: true });
+
+task('watch', function() {
+  jake.rmRf(BUILDDIR);
+  pipeline.watch = true;
+
+  pipeline.on('invalidate', function() {
+    pipeline.writeAll(BUILDDIR);
+  });
+
+  pipeline.writeAll(BUILDDIR);
+
+  // TODO: listen for EXIT signal.
+
+}, { async: true });

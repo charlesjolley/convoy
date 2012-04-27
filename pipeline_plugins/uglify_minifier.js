@@ -7,7 +7,7 @@ var UGLIFY = require('uglify-js');
 var _extend = require('../lib/utils').extend;
 
 var DEFAULT_UGLIFY_OPTIONS = {
-  // TODO: identify best default options
+  toplevel: true
 };
 
 function UglifyMinifier(asset, context, done) {
@@ -20,6 +20,7 @@ function UglifyMinifier(asset, context, done) {
 
   var pro = UGLIFY.uglify;
   var ast = UGLIFY.parser.parse(asset.body);
+  //ast = pro.ast_lift_variables(ast);
   ast = pro.ast_mangle(ast, options);
   ast = pro.ast_squeeze(ast, options);
   asset.body = pro.gen_code(ast, options);
