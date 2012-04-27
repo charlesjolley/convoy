@@ -5,13 +5,18 @@ var pipeline = require('convoy')({
 
   'app.js': {
     type: 'javascript',
-    main: path.resolve(module.filename, '../app/main.js'),
+    main: path.resolve(__dirname, './app/main'),
     minify: process.env.MODE === 'production'
   },
 
   'app.css': {
     type: 'css',
-    main: path.resolve(module.filename, '../app/styles')
+    main: path.resolve(__dirname, './app/styles')
+  },
+
+  'index.html': {
+    type: 'copy',
+    root: 'app/index.html'
   },
 
   'assets': {
