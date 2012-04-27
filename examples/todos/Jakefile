@@ -1,27 +1,33 @@
 
 
 var path = require('path');
-var pipeline = require('convoy')({
+var convoy = require('convoy');
+
+var pipeline = convoy({
 
   'app.js': {
-    type: 'javascript',
-    main: path.resolve(__dirname, './app/main'),
+    config: 'javascript',
+    main:   path.resolve(__dirname, './app/main'),
     minify: process.env.MODE === 'production'
   },
 
   'app.css': {
-    type: 'css',
-    main: path.resolve(__dirname, './app/styles')
+    config: 'css',
+    main:   path.resolve(__dirname, './app/styles')
   },
 
   'index.html': {
-    type: 'copy',
-    root: 'app/index.html'
+    config: 'copy',
+    root:   'app/index.html'
   },
 
   'assets': {
-    type: 'copy',
+    config: 'copy',
     root: 'app/assets'
+  // },
+
+  // 'app.manifest': {
+  //   config: require('html5-manifest/pipeline_config')
   }
 
 });

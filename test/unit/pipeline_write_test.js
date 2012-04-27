@@ -58,18 +58,18 @@ describe('[unit] pipeline writing', function() {
   beforeEach(function() {
     inst = new lib.Pipeline({
       'app.js': {
-        type: 'javascript',
-        main: h.fixture('sample_app')
+        config: 'javascript',
+        main:   h.fixture('sample_app')
       },
 
       'app.css': {
-        type: 'css',
-        main: h.fixture('sample_app/styles')
+        config: 'css',
+        main:   h.fixture('sample_app/styles')
       },
 
       'assets': {
-        type: 'copy',
-        root: h.fixture('sample_app/assets')
+        config: 'copy',
+        root:   h.fixture('sample_app/assets')
       }
     });
 
@@ -151,12 +151,12 @@ describe('[unit] pipeline writing', function() {
   it("should be able to run copy rules in parallel", function(done){
     inst = new lib.Pipeline({
       'images': {
-        type: 'copy',
+        config: 'copy',
         root: h.fixture('sample_app/assets/images')
       },
 
       'index.html': {
-        type: 'copy',
+        config: 'copy',
         root: h.fixture('sample_app/assets/index.html')
       }
     });
