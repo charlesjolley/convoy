@@ -7,7 +7,7 @@ var UGLIFY = require('uglify-js');
 var _extend = require('../lib/utils').extend;
 
 var DEFAULT_UGLIFY_OPTIONS = {
-  toplevel: true
+  // TODO: determine default options
 };
 
 function UglifyMinifier(asset, context, done) {
