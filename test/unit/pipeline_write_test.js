@@ -51,7 +51,7 @@ function testcss(path) {
   }
 }
 
-describe('[unit] pipeline', function() {
+describe('[unit] pipeline writing', function() {
 
   var inst, buildir, cnt=1;
 
@@ -142,6 +142,28 @@ describe('[unit] pipeline', function() {
       if (err) return done(err);
       ['app.js', 'app.css', 'assets/index.html', 
         'assets/images/a.png', 'assets/images/b.png'].forEach(function(file) {
+        PATH.existsSync(PATH.resolve(buildir, file)).should.equal(true, file);
+      });
+      done();
+    });
+  });
+
+  it("should be able to run copy rules in parallel", function(done){
+    inst = new lib.Pipeline({
+      'images': {
+        type: 'copy',
+        root: h.fixture('sample_app/assets/images')
+      },
+
+      'index.html': {
+        type: 'copy',
+        root: h.fixture('sample_app/assets/index.html')
+      }
+    });
+
+    inst.writeAll(buildir, function(err) {
+      if (err) return done(err);
+      ['index.html', 'images/a.png', 'images/b.png'].forEach(function(file) {
         PATH.existsSync(PATH.resolve(buildir, file)).should.equal(true, file);
       });
       done();
