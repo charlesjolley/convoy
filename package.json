@@ -5,14 +5,14 @@
   "description": "Pluggable, package-aware asset pipeline for node",
   "keywords": ["asset", "pipeline", "connect", "jake", "build", "tools"],
 
-  "homepage": "http://github.com/charlesjolley/convoy",
+  "homepage": "http://github.com/node-convoy/convoy",
   "bugs": {
-    "url": "http://github.com/charlesjolley/convoy/issues"
+    "url": "http://github.com/node-convoy/convoy/issues"
   },
 
   "repository": {
     "type": "git",
-    "url":  "http://github.com/charlesjolley/convoy.git"  
+    "url":  "http://github.com/node-convoy/convoy.git"  
   },
 
   "main": "./lib/index.js",
