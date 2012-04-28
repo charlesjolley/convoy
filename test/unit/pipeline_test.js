@@ -58,18 +58,18 @@ describe('[unit] pipeline writing', function() {
   beforeEach(function() {
     inst = new lib.Pipeline({
       'app.js': {
-        config: 'javascript',
-        main:   h.fixture('sample_app')
+        packager: 'javascript',
+        main:     h.fixture('sample_app')
       },
 
       'app.css': {
-        config: 'css',
-        main:   h.fixture('sample_app/styles')
+        packager: 'css',
+        main:     h.fixture('sample_app/styles')
       },
 
-      'assets': {
-        config: 'copy',
-        root:   h.fixture('sample_app/assets')
+      'built_assets': { // make dirname different
+        packager: 'copy',
+        root:     h.fixture('sample_app/assets')
       }
     });
 
@@ -118,8 +118,8 @@ describe('[unit] pipeline writing', function() {
   });
 
   it("should copy individual assets", function(done) {
-    var path = PATH.resolve(buildir, 'assets/index.html');
-    inst.writeFile('assets/index.html', buildir, function(err) {
+    var path = PATH.resolve(buildir, 'built_assets/index.html');
+    inst.writeFile('built_assets/index.html', buildir, function(err) {
       if (err) return done(err);
       PATH.existsSync(path).should.equal(true, path);
       done();
@@ -127,8 +127,8 @@ describe('[unit] pipeline writing', function() {
   });
 
   it("should copy all assets when directory is passed", function(done) {
-    var path = PATH.resolve(buildir, 'assets');
-    inst.writeFile('assets', buildir, function(err) {
+    var path = PATH.resolve(buildir, 'built_assets');
+    inst.writeFile('built_assets', buildir, function(err) {
       if (err) return done(err);
       ['index.html', 'images/a.png', 'images/b.png'].forEach(function(file) {
         PATH.existsSync(PATH.resolve(path, file)).should.equal(true, file);
@@ -140,8 +140,10 @@ describe('[unit] pipeline writing', function() {
   it("should build all assets for writeAll", function(done) {
     inst.writeAll(buildir, function(err) {
       if (err) return done(err);
-      ['app.js', 'app.css', 'assets/index.html', 
-        'assets/images/a.png', 'assets/images/b.png'].forEach(function(file) {
+      ['app.js', 'app.css', 
+        'built_assets/index.html', 
+        'built_assets/images/a.png', 
+      'built_assets/images/b.png'].forEach(function(file) {
         PATH.existsSync(PATH.resolve(buildir, file)).should.equal(true, file);
       });
       done();
@@ -151,12 +153,12 @@ describe('[unit] pipeline writing', function() {
   it("should be able to run copy rules in parallel", function(done){
     inst = new lib.Pipeline({
       'images': {
-        config: 'copy',
+        packager: 'copy',
         root: h.fixture('sample_app/assets/images')
       },
 
       'index.html': {
-        config: 'copy',
+        packager: 'copy',
         root: h.fixture('sample_app/assets/index.html')
       }
     });

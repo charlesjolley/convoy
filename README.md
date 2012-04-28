@@ -41,18 +41,18 @@ function and pass a config defining your assets:
     // create a new pipeline with an app.js and app.css file.
     var pipeline = convoy({
       'app.js': {
-        type: 'javascript',  // selects some default plugins
+        packager: 'javascript',  // selects some default plugins
         main:  path.resolve('app/main.js'), // starting module to include
         minify: true // must be set to minify output
       },
 
       'app.css': {
-        type: 'css',
+        packager: 'css',
         main: path.resolve('app/styles') // includes app/styles/index.css
       },
 
       'assets': {
-        type: 'copy',
+        packager: 'copy',
         root: 'app/assets'
       }
     });
@@ -126,12 +126,12 @@ the current one as well as any stylesheets found in the mythical `bootstrap`
 package installed via npm.
 
 Legacy JavaScript files work the same way. To build an asset with legacy 
-javascript instead of modules, use the `legacy_javascript` type when 
+javascript instead of modules, use the `legacy_javascript` packager when 
 configuring your pipeline:
 
     pipeline = convoy({
       'legacy.js': {
-        type: 'legacy_javascript',
+        packager: 'legacy_javascript',
         main: 'vendor/index.js'
       }
     });
@@ -216,14 +216,14 @@ the plugin function:
     var pipeline = convoy({
 
       'app.js': {
-        type: 'javascript',
+        packager: 'javascript',
         main: path.resolve('app/main.js'),
 
         finalizers: [CopyrightFinalizer]
       },
 
       'app.css': {
-        type: 'css',
+        packager: 'css',
         main: path.resolve('app/assets/main.less'),
 
         compilers: {

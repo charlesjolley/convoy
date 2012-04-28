@@ -9,6 +9,7 @@ var UGLIFY   = require('uglify-js');
 
 function packager(config) {
   return new lib.AssetPackager({
+    path: 'app.js',
     compilers: {
       '.js':  lib.plugins.JavaScriptCompiler
     },
@@ -56,7 +57,7 @@ describe('[unit] commonjs_packager', function() {
 
     packager({
       main: h.fixture('commonjs_package/single.js')
-    }).build(function(err, asset) {
+    }).build('app.js', function(err, asset) {
       if (err) return done(err);
       asset.body.should.equal(expected);
       done();
@@ -73,7 +74,7 @@ describe('[unit] commonjs_packager', function() {
     packager({
       main: h.fixture('commonjs_package/single.js'),
       minify: true
-    }).build(function(err, asset) {
+    }).build('app.js', function(err, asset) {
       if (err) return done(err);
       console.log('SIZE: '+ asset.body.length);
       asset.body.should.equal(expected);
@@ -95,7 +96,7 @@ describe('[unit] commonjs_packager', function() {
 
     packager({
       main: h.fixture('commonjs_package')
-    }).build(function(err, asset) {
+    }).build('app.js', function(err, asset) {
       if (err) return done(err);
       asset.body.should.equal(expected);
       done();
@@ -144,7 +145,7 @@ describe('[unit] commonjs_packager', function() {
 
     var log = h.captureLog(inst); // listen for logging events
 
-    inst.build(function(err, asset) {
+    inst.build('app.js', function(err, asset) {
       if (err) return done(err);
       should.exist(log.warnings[0]);
       log.warnings[0].should.match(/conflict/); // should log a conflict
