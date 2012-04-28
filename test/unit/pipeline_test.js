@@ -13,9 +13,8 @@ RegExp.escape = function(text) {
     return text.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, "\\$&");
 };
 
-function testmodules(path) {
-  var data = FS.readFileSync(path, 'utf8'),
-      idx, len = arguments.length;
+function testmodules(data) {
+  var idx, len = arguments.length;
 
   var lines = data.split('\n'), regex;
 
@@ -42,8 +41,7 @@ function testmodules(path) {
 
 }
 
-function testcss(path) {
-  var data = FS.readFileSync(path, 'utf8');
+function testcss(data) {
   var regex = [], idx, len = arguments.length;
   for(idx=1;idx<len;idx++) {
     regex = new RegExp('@module\\s+' + RegExp.escape(arguments[idx]));
@@ -51,7 +49,8 @@ function testcss(path) {
   }
 }
 
-describe('[unit] pipeline writing', function() {
+
+describe('[unit] pipeline', function() {
 
   var inst, buildir, cnt=1;
 
@@ -76,99 +75,194 @@ describe('[unit] pipeline writing', function() {
     buildir = h.tmpfile('public_'+cnt++) ;
   });
 
-  it('should build javascript', function(done) {
-    var path = PATH.resolve(buildir, 'app.js');
+  describe('writing', function() {
 
-    h.mkdirSync_p(buildir);
-    inst.writeFile('app.js', buildir, function(err) {
-      if (err) return done(err);
-      PATH.existsSync(path).should.equal(true);
-      testmodules(path,
-        'jquery/lib/jquery',
-        'ember/view',
-        'ember/core',
-        'ember/model',
-        'ember/application',
-        'sample_app/app/main',
-        'sample_app/app/core',
-        'sample_app/app/views/main_view',
-        'sample_app/app/templates/main_template',
-        'sample_app/app/models/person');
-      done();
-    });
-  });
+    it('should build javascript', function(done) {
+      var path = PATH.resolve(buildir, 'app.js');
 
-  it("should build css" , function(done) {
-    var path    = PATH.resolve(buildir, 'app.css');
-    h.mkdirSync_p(buildir);
-    inst.writeFile('app.css', buildir, function(err) {
-      if (err) return done(err);
-      PATH.existsSync(path).should.equal(true);
-      testcss(path,
-        'bootstrap/styles/index',
-        'bootstrap/styles/addon',
-        'bootstrap/styles/reset/index',
-        'bootstrap/styles/reset/body',
-        'bootstrap/styles/reset/type',
-        'sample_app/styles/global',
-        'sample_app/styles/models',
-        'sample_app/styles/index');
-      done();
-    });
-  });
-
-  it("should copy individual assets", function(done) {
-    var path = PATH.resolve(buildir, 'built_assets/index.html');
-    inst.writeFile('built_assets/index.html', buildir, function(err) {
-      if (err) return done(err);
-      PATH.existsSync(path).should.equal(true, path);
-      done();
-    });
-  });
-
-  it("should copy all assets when directory is passed", function(done) {
-    var path = PATH.resolve(buildir, 'built_assets');
-    inst.writeFile('built_assets', buildir, function(err) {
-      if (err) return done(err);
-      ['index.html', 'images/a.png', 'images/b.png'].forEach(function(file) {
-        PATH.existsSync(PATH.resolve(path, file)).should.equal(true, file);
+      h.mkdirSync_p(buildir);
+      inst.writeFile('app.js', buildir, function(err) {
+        if (err) return done(err);
+        PATH.existsSync(path).should.equal(true);
+        testmodules(FS.readFileSync(path, 'utf8'),
+          'jquery/lib/jquery',
+          'ember/view',
+          'ember/core',
+          'ember/model',
+          'ember/application',
+          'sample_app/app/main',
+          'sample_app/app/core',
+          'sample_app/app/views/main_view',
+          'sample_app/app/templates/main_template',
+          'sample_app/app/models/person');
+        done();
       });
-      done();
     });
+
+    it("should build css" , function(done) {
+      var path    = PATH.resolve(buildir, 'app.css');
+      h.mkdirSync_p(buildir);
+      inst.writeFile('app.css', buildir, function(err) {
+        if (err) return done(err);
+        PATH.existsSync(path).should.equal(true);
+        testcss(FS.readFileSync(path, 'utf8'),
+          'bootstrap/styles/index',
+          'bootstrap/styles/addon',
+          'bootstrap/styles/reset/index',
+          'bootstrap/styles/reset/body',
+          'bootstrap/styles/reset/type',
+          'sample_app/styles/global',
+          'sample_app/styles/models',
+          'sample_app/styles/index');
+        done();
+      });
+    });
+
+    it("should copy individual assets", function(done) {
+      var path = PATH.resolve(buildir, 'built_assets/index.html');
+      inst.writeFile('built_assets/index.html', buildir, function(err) {
+        if (err) return done(err);
+        PATH.existsSync(path).should.equal(true, path);
+        done();
+      });
+    });
+
+    it("should copy all assets when directory is passed", function(done) {
+      var path = PATH.resolve(buildir, 'built_assets');
+      inst.writeFile('built_assets', buildir, function(err) {
+        if (err) return done(err);
+        ['index.html', 'images/a.png', 'images/b.png'].forEach(function(file) {
+          PATH.existsSync(PATH.resolve(path, file)).should.equal(true, file);
+        });
+        done();
+      });
+    });
+
+    it("should build all assets for writeAll", function(done) {
+      inst.writeAll(buildir, function(err) {
+        if (err) return done(err);
+        ['app.js', 'app.css', 
+          'built_assets/index.html', 
+          'built_assets/images/a.png', 
+        'built_assets/images/b.png'].forEach(function(file) {
+          PATH.existsSync(PATH.resolve(buildir, file)).should.equal(true, file);
+        });
+        done();
+      });
+    });
+
+    it("should be able to run copy rules in parallel", function(done){
+      inst = new lib.Pipeline({
+        'images': {
+          packager: 'copy',
+          root: h.fixture('sample_app/assets/images')
+        },
+
+        'index.html': {
+          packager: 'copy',
+          root: h.fixture('sample_app/assets/index.html')
+        }
+      });
+
+      inst.writeAll(buildir, function(err) {
+        if (err) return done(err);
+        ['index.html', 'images/a.png', 'images/b.png'].forEach(function(file) {
+          PATH.existsSync(PATH.resolve(buildir, file)).should.equal(true, file);
+        });
+        done();
+      });
+    });
+
   });
 
-  it("should build all assets for writeAll", function(done) {
-    inst.writeAll(buildir, function(err) {
-      if (err) return done(err);
-      ['app.js', 'app.css', 
-        'built_assets/index.html', 
-        'built_assets/images/a.png', 
-      'built_assets/images/b.png'].forEach(function(file) {
-        PATH.existsSync(PATH.resolve(buildir, file)).should.equal(true, file);
+  describe('[unit] pipeline exists', function() {
+
+    it('should find packaged assets exist', function(done) {
+      inst.exists('app.js', function(exists) {
+        exists.should.equal(true);
+        done();
       });
-      done();
     });
+
+    it('should find copied assets exists', function(done) {
+      inst.exists('built_assets/index.html', function(exists) {
+        exists.should.equal(true);
+        done();
+      });
+    });
+
+    it('should not find missing assets', function(done) {
+      inst.exists('imaginary/foo/app.css', function(exists) {
+        exists.should.equal(false);
+        done();
+      });
+    });
+
+    it('should not find missing assets inside copied areas', function(done) {
+      inst.exists('built_assets/imaginary_asset.jpg', function(exists) {
+        exists.should.equal(false);
+        done();
+      });
+    });
+
   });
 
-  it("should be able to run copy rules in parallel", function(done){
-    inst = new lib.Pipeline({
-      'images': {
-        packager: 'copy',
-        root: h.fixture('sample_app/assets/images')
-      },
+  describe('[unit] pipeline build', function() {
 
-      'index.html': {
-        packager: 'copy',
-        root: h.fixture('sample_app/assets/index.html')
-      }
+    it('should build javascript', function(done) {
+
+      inst.build('app.js', function(err, asset) {
+        if (err) return done(err);
+        asset.path.should.equal('app.js');
+        asset.type.should.equal('application/javascript');
+        testmodules(asset.body,
+          'jquery/lib/jquery',
+          'ember/view',
+          'ember/core',
+          'ember/model',
+          'ember/application',
+          'sample_app/app/main',
+          'sample_app/app/core',
+          'sample_app/app/views/main_view',
+          'sample_app/app/templates/main_template',
+          'sample_app/app/models/person');
+        done();
+      });
     });
 
-    inst.writeAll(buildir, function(err) {
-      if (err) return done(err);
-      ['index.html', 'images/a.png', 'images/b.png'].forEach(function(file) {
-        PATH.existsSync(PATH.resolve(buildir, file)).should.equal(true, file);
+    it("should build css" , function(done) {
+      inst.build('app.css', function(err, asset) {
+        if (err) return done(err);
+        asset.path.should.equal('app.css');
+        asset.type.should.equal('text/css');
+        testcss(asset.body,
+          'bootstrap/styles/index',
+          'bootstrap/styles/addon',
+          'bootstrap/styles/reset/index',
+          'bootstrap/styles/reset/body',
+          'bootstrap/styles/reset/type',
+          'sample_app/styles/global',
+          'sample_app/styles/models',
+          'sample_app/styles/index');
+        done();
       });
-      done();
+    });
+
+    it("should copy individual assets", function(done) {
+      inst.build('built_assets/index.html', function(err, asset) {
+        if (err) return done(err);
+        asset.path.should.equal('built_assets/index.html');
+        asset.type.should.equal('text/html');
+        should.exist(asset.bodyStream);
+        done();
+      });
+    });
+
+    it("should return error for directory", function(done) {
+      inst.build('built_assets', function(err, asset) {
+        should.exist(err);
+        done();
+      });
     });
   });
 

@@ -22,7 +22,7 @@
     "resolve": "0.2.x",
     "uglify-js":  "~1.2",
     "glob": "~3.1",
-    "minimatch": "latest"
+    "mime": "~1.2"
   },
 
   "devDependencies": {
