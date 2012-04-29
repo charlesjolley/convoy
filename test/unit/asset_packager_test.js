@@ -6,6 +6,10 @@ var should   = require('should');
 var FS       = require('fs');
 var h  = require('../helpers');
 var lib = h.lib;
+var UTILS = require('../../lib/utils');
+var PATH  = require('path');
+var ASYNC = require('async');
+
 
 function packager(config) {
   return new lib.AssetPackager({
@@ -243,6 +247,198 @@ describe('[unit] asset_packager', function() {
       asset.body.should.equal(expected);
       done();
     });
+  });
+
+  describe('[watching]', function() {
+
+    var tmp = h.tmpfile('tmp_fixtures'), inst;
+
+    beforeEach(function(done) {
+
+      ASYNC.series([
+        function(next) {
+          UTILS.mkdir_p(tmp, next);
+        }, function(next) {
+          var paths = ['local_dependencies.js', 'test_module.js', 
+                       'test_module_2.js', 'required_module.js'];
+          ASYNC.forEach(paths, function(path, next) {
+            UTILS.cp(h.fixture(path), PATH.resolve(tmp, path), null, next);
+          }, next);
+        }, function(next) {
+          inst = packager({
+            main: PATH.resolve(tmp, 'local_dependencies.js'),
+            watch: true
+          });
+          next();
+        }
+      ], done);
+    });
+
+    afterEach(function() {
+      inst.unwatch();
+    });
+
+    it('should invalidate when main file changes', function(done) {
+      inst.build('app.js', function(err) {
+        if (err) return done(err);
+
+        // if not called then this will timeout eventually.
+        inst.on('invalidate', function() {
+          should.exist(true, 'invalidate called');
+          done();
+        });
+
+        var corePath = PATH.resolve(tmp, 'local_dependencies.js');
+        FS.writeFile(corePath, 'FOO', function(err) {
+          if (err) done(err);
+        });
+      });
+    });
+
+
+    it('should invalidate when a dependent changes', function(done) {
+      inst.build('app.js', function(err) {
+        if (err) return done(err);
+
+        // if not called then this will timeout eventually.
+        inst.on('invalidate', function() {
+          should.exist(true, 'invalidate called');
+          done();
+        });
+
+        var corePath = PATH.resolve(tmp, 'test_module.js');
+        FS.writeFile(corePath, 'FOO', function(err) {
+          if (err) done(err);
+        });
+      });
+    });
+
+    it('should not invalidate again until rebuilt', function(done) {
+      var shouldInvalidate = true, next;
+      var corePath = PATH.resolve(tmp, 'test_module.js');
+      var timer = null;
+      var cnt   = 1;
+
+      function writeFile() {
+        FS.writeFile(corePath, 'FOO ' + cnt++, function(err) {
+          if (err) {
+            if (timer) clearTimeout(timer);
+            done(err);
+          }
+        });
+      }
+
+      var states ;
+
+      function gotoState(key) {
+        states[key]();
+      }
+
+      // this test progresses through the states below. the basic idea is:
+      // 1. build, modify file -> should invalidate
+      // 2. modify file again -> should not invalidate again
+      // 3. build again, modify file -> should invalidate
+      states = {
+        first_build: function() {
+          inst.build('app.js', function(err) {
+            if (err) return done(err);
+            // if not called then this will timeout eventually.
+            inst.on('invalidate', function() {
+              shouldInvalidate.should.equal(true, 'invalidate called');
+              next();
+            });
+            gotoState('first_write');
+          });
+        },
+
+        first_write: function() {
+          shouldInvalidate = true;
+          next = function() { gotoState('second_write'); };
+          writeFile();
+        },
+
+        second_write: function() {
+          shouldInvalidate = false;
+          timer = setTimeout(function() {
+            gotoState('second_build');
+          }, 100);
+
+          next = function() {
+            clearTimeout(timer);
+            done();
+          };
+
+          writeFile();
+        },
+
+        second_build: function() {
+          inst.build('app.js', function(err) {
+            if (err) return done(err);
+            gotoState('third_write');
+          });
+        },
+
+        third_write: function() {
+          shouldInvalidate = true;
+          next = done;
+          writeFile();
+        }
+      };
+
+      gotoState('first_build');
+    });
+
+    it('should not invalidate when an unrelated file changes', function(done){
+      
+      inst.build('app.js', function(err) {
+        if (err) return done(err);
+
+        inst.on('invalidate', function() {
+          should.exist(false, 'invalidate called!');
+          clearTimeout(timer);
+          done(new Error('invalidate called'));
+        });
+
+        // give FS watcher some time.
+        var timer = setTimeout(function() {
+          should.exist(true, 'invalidate not called');
+          done();
+        }, 100);
+
+        var corePath = PATH.resolve(tmp, 'unrelated.js');
+        FS.writeFile(corePath, 'FOO', function(err) {
+          if (err) {
+            clearTimeout(timer);
+            done(err);
+          }
+        });
+      });
+    });
+
+    it ('should not invalidate until the asset has been built', function(done){
+
+      inst.on('invalidate', function() {
+        should.exist(false, 'invalidate called!');
+        clearTimeout(timer);
+        done(new Error('invalidate called'));
+      });
+
+      // give FS watcher some time.
+      var timer = setTimeout(function() {
+        should.exist(true, 'invalidate not called');
+        done();
+      }, 100);
+
+      var corePath = PATH.resolve(tmp, 'local_dependencies.js');
+      FS.writeFile(corePath, 'FOO', function(err) {
+        if (err) {
+          clearTimeout(timer);
+          done(err);
+        }
+      });
+
+    });
+
   });
 
 });

@@ -22,7 +22,8 @@
     "resolve": "0.2.x",
     "uglify-js":  "~1.2",
     "glob": "~3.1",
-    "mime": "~1.2"
+    "mime": "~1.2",
+    "watch": "latest"
   },
 
   "devDependencies": {
