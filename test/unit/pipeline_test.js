@@ -106,11 +106,11 @@ describe('[unit] pipeline', function() {
         if (err) return done(err);
         PATH.existsSync(path).should.equal(true);
         testcss(FS.readFileSync(path, 'utf8'),
-          'bootstrap/styles/index',
-          'bootstrap/styles/addon',
-          'bootstrap/styles/reset/index',
-          'bootstrap/styles/reset/body',
           'bootstrap/styles/reset/type',
+          'bootstrap/styles/reset/body',
+          'bootstrap/styles/reset/index',
+          'bootstrap/styles/addon',
+          'bootstrap/styles/index',
           'sample_app/styles/global',
           'sample_app/styles/models',
           'sample_app/styles/index');

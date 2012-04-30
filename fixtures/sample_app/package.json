@@ -1,21 +1,4 @@
 {
   "name": "sample_app",
-  "main": "./app/main.js",
-
-  "convoy": {
-    "javascript": {
-      "compilers": {
-        ".js":     "convoy/pipeline_plugins/javascript_compiler",
-        ".coffee": "convoy/pipeline_plugins/coffeescript_compiler",
-        ".hbr":    "ember/pipeline_plugins/handlebars_compiler"
-      }
-    },
-
-    "css": {
-      "compilers": {
-        ".css":    "convoy/pipeline_plugins/css_compiler",
-        ".less":   "convoy/pipeline_plugins/less_compiler"
-      }
-    }
-  }
+  "main": "./app/main.js"
 }
