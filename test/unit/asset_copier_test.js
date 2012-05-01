@@ -29,45 +29,36 @@ describe('[unit] asset_copier', function() {
       });
     });
 
-    it('should writeFile', function(done) {
-      var tmppath = h.tmpfile('' + (cnt++) + '_test_module.js');
-      inst.writeFile(tmppath, 'test_module_foo.js', function(err) {
+    it('should build file', function(done) {
+      inst.build('test_module_foo.js', function(err, asset) {
         if (err) return done(err);
-        var expected = FS.readFileSync(inst.root, 'utf8');
-        FS.readFileSync(tmppath, 'utf8').should.equal(expected);
+        asset.should.have.property('path', 'test_module_foo.js');
+        asset.should.have.property('type', 'application/javascript');
+        asset.should.have.property('bodyPath', h.fixture('test_module.js'));
         done();
       });
     });
 
-    it('should build file', function(done) {
-      var tmppath = h.tmpfile('' + (cnt++) + '_test_module.js');
+    it('should add mtime and size', function(done) {
+      var stats = FS.statSync(h.fixture('test_module.js'));
       inst.build('test_module_foo.js', function(err, asset) {
         if (err) return done(err);
-        asset.path.should.equal('test_module_foo.js');
-        asset.type.should.equal('application/javascript');
-        should.exist(asset.bodyStream);
-
-        var os = FS.createWriteStream(tmppath);
-        UTIL.pump(asset.bodyStream, os, function(err) {
-          if (err) return done(err);
-          var expected = FS.readFileSync(inst.root, 'utf8');
-          FS.readFileSync(tmppath, 'utf8').should.equal(expected);
-          done();
-        });
-
+        asset.should.have.property('mtime', stats.mtime.getTime());
+        asset.should.have.property('size', stats.size);
+        done();
       });
     });
 
-    it('should exists logical filen', function(done) {
+    it('should exists logical file', function(done) {
       inst.exists('test_module_foo.js', function(exists) {
-        exists.should.equal(true);
+        exists.should.equal(true, 'test_module_foo.js');
         done();
       });
     });
 
     it('should not say real file exists', function(done) {
       inst.exists('test_module.js', function(exists) {
-        exists.should.equal(false);
+        exists.should.equal(false, 'test_module.js');
         done();
       });
     });
@@ -98,44 +89,13 @@ describe('[unit] asset_copier', function() {
       });
     });
 
-    it('should writeFile for path inside of directory', function(done) {
-      var tmppath = h.tmpfile('' + (cnt++) + '_main.js');
-      inst.writeFile(tmppath, 'sample_app_foo/main.js', function(err) {
-        if (err) return done(err);
-        var expected = 
-          FS.readFileSync(PATH.resolve(inst.root, 'main.js'), 'utf8');
-        FS.readFileSync(tmppath, 'utf8').should.equal(expected);
-        done();
-      });
-    });
-
-    it('should writeFile entire directory', function(done) {
-      var tmppath = h.tmpfile('' + (cnt++) + '_app');
-      inst.writeFile(tmppath, 'sample_app_foo', function(err) {
-        if (err) return done(err);
-        var expected;
-        ['main.js', 'core.js', 'views/main_view.js'].forEach(function(fname) {
-          expected = FS.readFileSync(PATH.resolve(inst.root, fname), 'utf8');
-          FS.readFileSync(PATH.resolve(tmppath, fname), 'utf8')
-            .should.equal(expected);
-        });
-        done();
-      });
-    });
-
     it('should build single path inside of directory', function(done) {
       var tmppath = h.tmpfile('' + (cnt++) + '_main.js');
       inst.build('sample_app_foo/main.js', function(err, asset) {
         if (err) return done(err);
-        var expected = 
-          FS.readFileSync(PATH.resolve(inst.root, 'main.js'), 'utf8');
-
-        var os = FS.createWriteStream(tmppath);
-        UTIL.pump(asset.bodyStream, os, function(err) {
-          if (err) return done(err);
-          FS.readFileSync(tmppath, 'utf8').should.equal(expected);
-          done();
-        });
+        asset.should.have.property('bodyPath', 
+          PATH.resolve(inst.root, 'main.js'));
+        done();
       });
     });
 
@@ -154,11 +114,11 @@ describe('[unit] asset_copier', function() {
       });
     });
 
-    it('should say directory exists', function(done) {
+    it('should not say directory exists', function(done) {
       var paths = ['sample_app_foo', 'sample_app_foo/templates'];
       ASYNC.forEach(paths, function(path, next) {
         inst.exists(path, function(exists) {
-          exists.should.equal(true, path);
+          exists.should.equal(false, path);
           next();
         });
       }, done);

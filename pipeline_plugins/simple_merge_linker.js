@@ -8,6 +8,11 @@ function SimpleMergeLinker(asset, context, done) {
     if (err) return done(err);
     asset.body = 
       expanded.map(function(asset) { return asset.body; }).join("\n");
+
+    asset.mtime = expanded.reduce(function (curMtime, asset) {
+      return Math.max(curMtime || 0, asset.mtime || 0);
+    }, 0);
+    
     done();
   });
 }

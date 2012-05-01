@@ -127,13 +127,10 @@ describe('[unit] pipeline', function() {
       });
     });
 
-    it("should copy all assets when directory is passed", function(done) {
-      var path = PATH.resolve(buildir, 'built_assets');
+    it("should return error when directory is passed", function(done) {
+      inst.on('error', function() {}); // prevent exception
       inst.writeFile('built_assets', buildir, function(err) {
-        if (err) return done(err);
-        ['index.html', 'images/a.png', 'images/b.png'].forEach(function(file) {
-          PATH.existsSync(PATH.resolve(path, file)).should.equal(true, file);
-        });
+        should.exist(err);
         done();
       });
     });
@@ -233,8 +230,8 @@ describe('[unit] pipeline', function() {
     it("should build css" , function(done) {
       inst.build('app.css', function(err, asset) {
         if (err) return done(err);
-        asset.path.should.equal('app.css');
-        asset.type.should.equal('text/css');
+        asset.should.have.property('path','app.css');
+        asset.should.have.property('type', 'text/css');
         testcss(asset.body,
           'bootstrap/styles/index',
           'bootstrap/styles/addon',
@@ -251,14 +248,16 @@ describe('[unit] pipeline', function() {
     it("should copy individual assets", function(done) {
       inst.build('built_assets/index.html', function(err, asset) {
         if (err) return done(err);
-        asset.path.should.equal('built_assets/index.html');
-        asset.type.should.equal('text/html');
-        should.exist(asset.bodyStream);
+        asset.should.have.property('path','built_assets/index.html');
+        asset.should.have.property('type', 'text/html');
+        asset.should.have.property('bodyPath', 
+          h.fixture('sample_app/assets/index.html'));
         done();
       });
     });
 
     it("should return error for directory", function(done) {
+      inst.on('error', function() {}); // prevent exception
       inst.build('built_assets', function(err, asset) {
         should.exist(err);
         done();

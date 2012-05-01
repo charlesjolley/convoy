@@ -25,6 +25,70 @@ function packager(config) {
 
 describe('[unit] asset_packager', function() {
 
+  describe("getSourceAsset", function() {
+
+    var inst;
+
+    beforeEach(function() {
+      inst = packager({
+        path: 'app.js',
+        main: h.fixture('demo_package/main.js')
+      });
+    });
+
+    it('should return an asset object for main module', function(done) {
+      var path = h.fixture('demo_package/main.js');
+      var stat = FS.statSync(path);
+      var body = FS.readFileSync(path, 'utf8');
+      inst.getSourceAsset(path, function(err, asset) {
+        if (err) return done(err);
+        asset.should.have.property('path', path);
+        asset.should.have.property('body', body);
+        asset.should.have.property('mtime', stat.mtime.getTime());
+        asset.should.have.property('id', 'demo_package/main');
+        asset.dependencies.should.eql([
+          h.fixture('demo_package/lib/mod1.js')
+        ]);
+
+        asset.parents.should.eql([]);
+        asset.children.should.eql([]);
+        done();
+      });
+    });
+
+    it('should return an error for a relative path', function(done) {
+      inst.on('error', function() {}); // prevents exception
+      inst.getSourceAsset('./main.js', function(err, asset) {
+        should.exist(err);
+        done();
+      });
+    });
+
+    it('should return a raw asset for any file with a compiler', function(done){
+      var path = h.fixture('demo_package/conflict_test.js');
+      var stat = FS.statSync(path);
+      var body = FS.readFileSync(path, 'utf8');
+      inst.getSourceAsset(path, function(err, asset) {
+        if (err) return done(err);
+        asset.should.have.property('path', path);
+        asset.should.have.property('body', body);
+        asset.should.have.property('mtime', stat.mtime.getTime());
+        asset.id.should.equal('demo_package/conflict_test');
+        done();
+      });
+    });
+
+    it('should return error for asset without compiler', function(done) {
+      inst.on('error', function() {}); // prevents exception
+      var path = h.fixture('sample_app/app/styles/global.css');
+      inst.getSourceAsset(path, function(err, asset) {
+        should.exist(err);
+        done();
+      });
+    });
+
+  });
+
   describe("[with no dependencies]", function() {
 
     var inst, expected;
@@ -44,7 +108,7 @@ describe('[unit] asset_packager', function() {
       function(done) {
       inst.build('app.js', function(err, asset) {
         if (err) return done(err);
-        asset.body.should.equal(expected);
+        asset.should.have.property('body', expected);
         done();
       });
     });
@@ -72,27 +136,20 @@ describe('[unit] asset_packager', function() {
       });
     });
 
-    it("should write out contents", function(done) {
-      var tmpfile = h.tmpfile();
-      inst.writeFile(tmpfile, 'app.js', function(err) {
+    it('should match newest mtime', function(done) {
+      var mtime = ['test_module.js', 'test_module_2.js'].reduce(
+      function(cur, fname) {
+        var next = FS.statSync(h.fixture(fname)).mtime.getTime();
+        return Math.max(next, cur);
+      }, 0); 
+
+      mtime.should.not.equal(0);
+      inst.build('app.js', function(err, asset) {
         if (err) return done(err);
-        FS.readFileSync(tmpfile, 'utf8').should.equal(expected);
+        asset.should.have.property('mtime', mtime);
         done();
       });
-    });
 
-    it("should write out contents on each call", function(done) {
-      var tmpfile = h.tmpfile();
-      inst.writeFile(tmpfile, 'app.js', function(err) {
-        if (err) return done(err);
-        var expected = FS.readFileSync(tmpfile, 'utf8');
-        FS.writeFileSync(tmpfile, "DUMMY"); // make sure write happens again
-        inst.writeFile(tmpfile, 'app.js', function(err) {
-          if (err) return done(err);
-          FS.readFileSync(tmpfile, 'utf8').should.equal(expected);
-          done();
-        });
-      });
     });
 
   });
@@ -112,7 +169,7 @@ describe('[unit] asset_packager', function() {
 
       inst.build('app.js', function(err, asset) {
         if (err) return done(err);
-        asset.body.should.equal(expected);
+        asset.should.have.property('body', expected);
         done();
       });
     });
@@ -128,7 +185,7 @@ describe('[unit] asset_packager', function() {
 
       inst.build('app.js', function(err, asset) {
         if (err) return done(err);
-        asset.body.should.equal(expected);
+        asset.should.have.property('body', expected);
         done();
       });
     });
@@ -142,7 +199,7 @@ describe('[unit] asset_packager', function() {
         main: h.fixture('demo_package')
       }).build('app.js', function(err, asset) {
         if (err) return done(err);
-        asset.body.should.equal(expected);
+        asset.should.have.property('body', expected);
         done();        
       });
     });
@@ -158,7 +215,7 @@ describe('[unit] asset_packager', function() {
         main: h.fixture('demo_package/lib/requires_package.js')
       }).build('app.js', function(err, asset) {
         if (err) return done(err);
-        asset.body.should.equal(expected);
+        asset.should.have.property('body', expected);
         done();
       });
     });
@@ -178,7 +235,7 @@ describe('[unit] asset_packager', function() {
         minify: true
       }).build('app.js', function(err, asset) {
         if (err) return done(err);
-        asset.body.should.equal(expected);
+        asset.should.have.property('body', expected);
         done();
       });
     });
@@ -200,7 +257,7 @@ describe('[unit] asset_packager', function() {
         minify: options
       }).build('app.js', function(err, asset) {
         if (err) return done(err);
-        asset.body.should.equal(expected);
+        asset.should.have.property('body', expected);
         done();
       });
     });
@@ -244,7 +301,7 @@ describe('[unit] asset_packager', function() {
       if (err) return done(err);
       should.exist(log.warnings[0]);
       log.warnings[0].should.match(/conflict/); // should log a conflict
-      asset.body.should.equal(expected);
+      asset.should.have.property('body', expected);
       done();
     });
   });
