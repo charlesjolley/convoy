@@ -168,6 +168,15 @@ describe('[unit] asset_copier', function() {
       timer=  null;
     }
 
+    // delay in order to have time to setup watch
+    function writeLater(path, body) {
+      setTimeout(function() {
+        FS.writeFile(path, body, function(err) {
+          should.not.exist(err);
+        });
+      }, 20);
+    }
+
     beforeEach(function(done) {
       tmproot = h.tmpfile('sample_app_' + cnt++);
       utils.cp_r(h.fixture('sample_app/app'), tmproot, null, function(err) {
@@ -198,7 +207,7 @@ describe('[unit] asset_copier', function() {
         done();
       };
       wait(done);
-      FS.writeFile(PATH.resolve(tmproot, 'main.js'), 'FOO');
+      writeLater(PATH.resolve(tmproot, 'main.js'), 'FOO');
     });
 
     it('should invalidate when single file changes', function(done) {
@@ -208,7 +217,8 @@ describe('[unit] asset_copier', function() {
           should.ok('invalidated');
           done();
         };
-        FS.writeFile(PATH.resolve(tmproot, 'main.js'), 'FOO');
+
+        writeLater(PATH.resolve(tmproot, 'main.js'), 'FOO');
       });
     });
 
@@ -219,7 +229,7 @@ describe('[unit] asset_copier', function() {
           should.ok('invalidated');
           done();
         };
-        FS.writeFile(PATH.resolve(tmproot, 'views/main_view.js'), 'FOO');
+        writeLater(PATH.resolve(tmproot, 'views/main_view.js'), 'FOO');
       });
     });
 
@@ -230,7 +240,7 @@ describe('[unit] asset_copier', function() {
           should.ok('invalidated');
           done();
         };
-        FS.writeFile(PATH.resolve(tmproot, 'new_file.txt'), 'FOO');
+        writeLater(PATH.resolve(tmproot, 'new_file.txt'), 'FOO');
       });
     });
 
@@ -241,7 +251,12 @@ describe('[unit] asset_copier', function() {
           should.ok('invalidated');
           done();
         };
-        FS.unlink(PATH.resolve(tmproot, 'views/main_view.js'));
+
+        setTimeout(function() {
+          FS.unlink(PATH.resolve(tmproot, 'views/main_view.js'), function(e){
+            should.not.exist(e);
+          });
+        }, 20);
       });
     });
 
@@ -252,7 +267,12 @@ describe('[unit] asset_copier', function() {
           should.ok('invalidated');
           done();
         };
-        FS.mkdir(PATH.resolve(tmproot, 'tests'));
+
+        setTimeout(function() {
+          FS.mkdir(PATH.resolve(tmproot, 'tests'), function(err) {
+            should.not.exist(err);
+          });
+        }, 20);
       });
     });
 
@@ -266,7 +286,12 @@ describe('[unit] asset_copier', function() {
             should.ok('invalidated');
             done();
           };
-          FS.unlink(PATH.resolve(tmproot, 'tests'));
+
+          setTimeout(function() {
+            FS.rmdir(PATH.resolve(tmproot, 'tests'), function(err) {
+              should.not.exist(err);
+            });
+          }, 20);
         });
       });
     });
