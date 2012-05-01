@@ -4,9 +4,9 @@
 
 var should   = require('should');
 var FS       = require('fs');
-var h  = require('../helpers');
+var h  = require('./support/helpers');
 var lib = h.lib;
-var UTILS = require('../../lib/utils');
+var UTILS = require('../lib/utils');
 var PATH  = require('path');
 var ASYNC = require('async');
 

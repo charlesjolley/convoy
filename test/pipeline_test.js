@@ -4,7 +4,7 @@
  */
 
 var should   = require('should');
-var h  = require('../helpers');
+var h  = require('./support/helpers');
 var lib = h.lib;
 var FS  = require('fs');
 var PATH = require('path');

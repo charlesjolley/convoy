@@ -9,7 +9,7 @@ var temp = require('temp');
 var UGLIFY = require('uglify-js');
 
 var DIRNAME       = path.dirname(module.filename);
-var FIXTURES_PATH = path.resolve(DIRNAME, '..', 'fixtures');
+var FIXTURES_PATH = path.resolve(DIRNAME, '..', '..', 'fixtures');
 
 /**
  * Returns path to an object within the fixtures directory. Works just like
@@ -23,7 +23,7 @@ exports.fixture = function() {
 };
 
 // load the whole module for testing.
-exports.lib = require('../lib');
+exports.lib = require('../../lib');
 
 exports.loadEach = function() {
   var paths = Array.prototype.slice.call(arguments);

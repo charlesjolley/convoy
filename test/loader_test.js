@@ -3,8 +3,8 @@
  */
 
 var should = require('should');
-var loader = require('../../lib/loader');
-var h      = require('../helpers');
+var loader = require('../lib/loader');
+var h      = require('./support/helpers');
 
 describe('[unit] loader', function() {
 

@@ -4,11 +4,11 @@
 
 // most of these tests are borrowed from the connect.static middleware tests
 
-require('../support/http');
+require('./support/http');
 
 var connect = require('connect');
-var convoy  = require('../../lib');
-var h = require('../helpers');
+var convoy  = require('../lib');
+var h = require('./support/helpers');
 var PATH = require('path');
 var ASYNC = require('async');
 

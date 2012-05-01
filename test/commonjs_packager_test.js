@@ -3,7 +3,7 @@
  */
 
 var should   = require('should');
-var h  = require('../helpers');
+var h  = require('./support/helpers');
 var lib = h.lib;
 var UGLIFY   = require('uglify-js');
 
@@ -76,7 +76,6 @@ describe('[unit] commonjs_packager', function() {
       minify: true
     }).build('app.js', function(err, asset) {
       if (err) return done(err);
-      console.log('SIZE: '+ asset.body.length);
       asset.body.should.equal(expected);
       done();
     });
