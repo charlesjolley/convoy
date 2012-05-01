@@ -1,5 +1,6 @@
 
 TESTS = test/*_test.js
+#REPORTER = spec
 REPORTER = dot
 # DOX = ./node_modules/.bin/dox
 
