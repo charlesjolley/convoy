@@ -10,7 +10,6 @@
   e.JavaScriptCompiler   = require('./javascript_compiler');
   e.CoffeeScriptCompiler = require('./coffeescript_compiler');
   e.CSSCompiler          = require('./css_compiler');
-  e.LESSCompiler         = require('./less_compiler');
 
   e.GenericAnalyzer      = require('./generic_analyzer');
   e.CommonJSAnalyzer     = require('./commonjs_analyzer');

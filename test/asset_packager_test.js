@@ -2,7 +2,7 @@
  * @module asset_packager
  */
 
-var should   = require('should');
+var should = require('should');
 var FS       = require('fs');
 var h  = require('./support/helpers');
 var lib = h.lib;
@@ -19,7 +19,8 @@ function packager(config) {
     },
     analyzer: lib.plugins.GenericAnalyzer,
     linker:   lib.plugins.SimpleMergeLinker,
-    minifier: lib.plugins.UglifyMinifier
+    minifier: lib.plugins.UglifyMinifier,
+    mainKey:  'main'
   }, config);
 }
 

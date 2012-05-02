@@ -4,6 +4,7 @@
 
 // most of these tests are borrowed from the connect.static middleware tests
 
+var should = require('should');
 require('./support/http');
 
 var connect = require('connect');

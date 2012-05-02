@@ -2,7 +2,7 @@
  * @module module_packager test
  */
 
-var should   = require('should');
+var should = require('should');
 var h  = require('./support/helpers');
 var lib = h.lib;
 var UGLIFY   = require('uglify-js');
@@ -16,7 +16,8 @@ function packager(config) {
 
     analyzer: lib.plugins.CommonJSAnalyzer,
     linker:   lib.plugins.CommonJSLinker,
-    minifier: lib.plugins.UglifyMinifier
+    minifier: lib.plugins.UglifyMinifier,
+    mainKey:  'main'
   }, config);
 }
 

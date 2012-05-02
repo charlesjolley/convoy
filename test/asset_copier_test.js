@@ -2,12 +2,12 @@
  * @module asset_copier
  */
 
+var should = require('should');
 var FS    = require('fs');
 var UTIL  = require('util');
 var PATH  = require('path');
 var ASYNC = require('async');
 
-var should = require('should');
 var h      = require('./support/helpers');
 var lib    = h.lib;
 var utils  = require('../lib/utils');

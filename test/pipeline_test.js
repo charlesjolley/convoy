@@ -3,7 +3,7 @@
  * @copyright 2012 Charles Jolley
  */
 
-var should   = require('should');
+var should = require('should');
 var h  = require('./support/helpers');
 var lib = h.lib;
 var FS  = require('fs');
