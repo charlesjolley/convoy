@@ -1,5 +1,5 @@
-node_modules/
-!fixtures/*/node_modules
+/node_modules
+!fixtures/*
 examples/todos/public
 examples/todos/node_modules
 .DS_Store
