@@ -1,6 +1,6 @@
 {
   "name": "convoy",
-  "version": "v0.2.0",
+  "version": "v0.3.0",
   "author": "Charles Jolley <charles@sproutcore.com>",
   "description": "Pluggable, package-aware asset pipeline for node",
   "keywords": ["asset", "pipeline", "connect", "jake", "build", "tools"],
