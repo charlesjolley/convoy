@@ -22,15 +22,15 @@
     "uglify-js":  "~1.2",
     "glob": "~3.1",
     "mime": "~1.2",
-    "coffee-script": "~1.3"
+    "coffee-script": "~1.3",
+    "connect": "~2.2"
   },
 
   "devDependencies": {
     "should": "latest",
     "mocha": "latest",
     "dox": "latest",
-    "temp": "latest",
-    "connect": "latest"
+    "temp": "latest"
   },
 
   "scripts": {
