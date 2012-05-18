@@ -71,7 +71,12 @@ function CommonJSLinker(asset, context, done) {
       // if this asset is also the main module for the package, then include
       // in wrap
       } else if (asset.pkg && asset.pkg.main) {
-        var mainPath = context.resolve(asset.pkg.path, asset.pkg.main);
+        var mainPath;
+        try {
+          mainPath = context.resolve(asset.pkg.path, asset.pkg.main);
+        } catch (e) {
+          mainPath = null; // ignore main path if none 
+        }
         if (asset.path === mainPath) id = [id, PATH.basename(asset.pkg.path)];
       }
 
