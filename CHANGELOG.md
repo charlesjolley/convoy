@@ -1,3 +1,10 @@
+# v0.3.1
+  * Add convoy binary - mostly for testing purposes.
+  * Now ignores requires for built-in node modules.
+  * Add exception to ignore some requires for jquery so that it will work as
+    expected. This is a temporary solution; it would be better to get that 
+    package author to change his code.
+    
 # v0.3.0
 
   * Better logging, multiple bug fixes.
