@@ -1,10 +1,4 @@
 
 - Select compiler/preprocessor for each source file based on config in local
   package.
-- Add middleware for connect
-- Add plugins/type for HTML5 manifest
-- Add watch support. cases to test:
-  - adding files to the copied area
-  - modified a deeply required file
-  - modify a package.json for affected package
 - Figure out how to add assets from packages.
