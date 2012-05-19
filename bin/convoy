@@ -1,0 +1,100 @@
+#!/usr/bin/env node
+
+var program = require('commander');
+var convoy  = require('../lib');
+var path    = require('path');
+var fs      = require('fs');
+
+// without naming a pipeline:
+// convoy path/to/module > combines, outputs to stderr.
+// convoy path/to/module --packager css > combines w/ packager, output to stder
+// convoy path/to/module --pipeline path/to/pipleine > now gets asset
+
+/**
+ * convoy main1.js main2.js > output.js
+ * convoy --pipeline my/pipeline.js main1.js > output.js
+ */
+program
+  .version(require('../package').version)
+  .option('-p, --packager [pathOrModule]', 'packager to use', 'javascript')
+  .option('-P, --pipeline [pathOrModule]', 'optional pipeline definition')
+  .option('-o, --output [path]', 'file to output to (defaults to stdout)')
+  .option('-w, --watch', 'watch inputs and rebuild, requires output')
+  .option('-m, --minify', 'set minify flag')
+  .option('-a, --all', 'build all files in the pipeline')
+  .parse(process.argv);
+
+// extract and normalize some options
+var inputPaths = program.args.map(function(pathName) {
+  return path.resolve(pathName);
+});
+
+var buildFile, buildir = path.resolve(program.output || 'app.js');
+if (!(program.pipeline && program.all)) {
+  buildFile = path.basename(buildir);
+  buildir   = path.dirname(buildir);
+}
+
+// get a pipeline
+var pipeline;
+if(program.pipeline) {
+  abort("--pipeline not yet implemented");
+} else {
+  if (program.watch && !program.output) {
+    abort('you must specify an output file to use --watch');
+  }
+
+  pipeline = makePipeline(inputPaths, buildFile, {
+    packager: program.packager, // todo: resolve when using moduleIds
+    watch:    program.watch,
+    minify:   program.minify
+  });
+}
+
+// write or build
+if (program.all) {
+  process.stdout.write("Writing files to "+buildir+"...");
+  pipeline.writeAll(buildir, function(err) {
+    if (err) abort(err);
+    process.stdout.write("Done.\n");
+    process.exit(0);
+  });
+
+} else if (program.output) {
+  process.stdout.write("Writing asset to "+path.join(buildir, buildFile)+'...');
+  pipeline.writeFile(buildFile, buildir, function(err) {
+    if (err) abort(err);
+    process.stdout.write("Done.\n");
+    process.exit(0);
+  });
+
+} else {
+  pipeline.build(buildFile, function(err, asset) {
+    if (err) abort(err);
+    process.stdout.write(asset.body);
+    process.exit(0);
+  });
+}
+
+//.................
+// SUPPORT FUNCTIONS
+//
+
+function abort(msg) {
+  console.error(msg);
+  process.exit(1);
+}
+
+function makePipeline(inputPaths, outputFilename, opts) {
+  inputPaths = inputPaths.map(function(inputPath) {
+    return path.resolve(process.cwd(), inputPath);
+  });
+
+  var config = { watch: opts.watch };
+  config[outputFilename] = {
+    packager: opts.packager,
+    main:     inputPaths,
+    minify:   opts.minify
+  };
+  return convoy(config);
+}

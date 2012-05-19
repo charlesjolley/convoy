@@ -6,6 +6,16 @@
 var UGLIFY = require('uglify-js');
 var PATH = require('path');
 
+// modules found here are skipped as requirements. Mostly this includes the 
+// builtin modules for node as well as some specific exceptions for jquery 
+var EXCEPTIONS = {
+  '__node': ['util', 'events', 'stream', 'buffer', 'crypto', 'tls', 'fs', 'path', 
+        'net', 'dgram', 'dns', 'http', 'url', 'querystring', 'https', 
+        'readline', 'vm', 'child_process', 'asset', 'tty', 'zlib', 'os',
+        'cluster'],
+  'jquery': ['jsdom', 'xmlhttprequest', 'location', 'navigator']
+};
+
 function _extractRequiredModules(asset) {
   var ast, results = [],
     walker = UGLIFY.uglify.ast_walker();
@@ -23,7 +33,11 @@ function _extractRequiredModules(asset) {
 
   function handleExpr(expr, args) {
     if (expr[0] === 'name' && expr[1] === 'require') {
-      results.push(args[0][1]);
+      var moduleId = args[0][1];
+      var exceptions = asset.pkg && EXCEPTIONS[asset.pkg.name];
+      var isException = (EXCEPTIONS.__node.indexOf(moduleId)>=0 ||
+          (exceptions && exceptions.indexOf(moduleId)>=0));
+      if (!isException) results.push(moduleId);
     }
   }
 
