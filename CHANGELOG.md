@@ -1,3 +1,7 @@
+# v0.3.2
+  * Better reporting when modules are not found.
+  * Expanded list of excepted modules
+  
 # v0.3.1
   * Add convoy binary - mostly for testing purposes.
   * Now ignores requires for built-in node modules.
