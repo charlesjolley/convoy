@@ -9,11 +9,11 @@ var PATH = require('path');
 // modules found here are skipped as requirements. Mostly this includes the 
 // builtin modules for node as well as some specific exceptions for jquery 
 var EXCEPTIONS = {
-  '__node': ['util', 'events', 'stream', 'buffer', 'crypto', 'tls', 'fs', 'path', 
-        'net', 'dgram', 'dns', 'http', 'url', 'querystring', 'https', 
-        'readline', 'vm', 'child_process', 'asset', 'tty', 'zlib', 'os',
-        'cluster'],
-  'jquery': ['jsdom', 'xmlhttprequest', 'location', 'navigator']
+  '__node': require('../lib/resolver').core, 
+  '__narwhal': { system: true, file: true },
+  'jquery': { 
+    jsdom: true, xmlhttprequest: true, location: true, navigator: true 
+  } 
 };
 
 function _extractRequiredModules(asset) {
@@ -35,8 +35,9 @@ function _extractRequiredModules(asset) {
     if (expr[0] === 'name' && expr[1] === 'require') {
       var moduleId = args[0][1];
       var exceptions = asset.pkg && EXCEPTIONS[asset.pkg.name];
-      var isException = (EXCEPTIONS.__node.indexOf(moduleId)>=0 ||
-          (exceptions && exceptions.indexOf(moduleId)>=0));
+      var isException = 
+          EXCEPTIONS.__node[moduleId] || EXCEPTIONS.__narwhal[moduleId] ||
+          (exceptions && exceptions[moduleId]); 
       if (!isException) results.push(moduleId);
     }
   }
@@ -53,9 +54,14 @@ function _extractRequiredModules(asset) {
 function CommonJSAnalyzer(asset, context, done) {
   asset.pkg = context.getNearestPackage(asset.path);
   var modules = _extractRequiredModules(asset);
-  asset.dependencies = modules.map(function(moduleId) {
-    return context.resolve(moduleId, PATH.dirname(asset.path));
-  });
+  try {
+    asset.dependencies = modules.map(function(moduleId) {
+      return context.resolve(moduleId, PATH.dirname(asset.path));
+    });
+  } catch (e) {
+    e.message = e.message +' (required in '+asset.id+')';
+    throw e;
+  }
 
   done();
 }
