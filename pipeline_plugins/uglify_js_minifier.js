@@ -1,5 +1,5 @@
 /**
- * @module uglify_minifier
+ * @module uglify_js_minifier
  * @copyright 2012 Charles Jolley
  */
 
@@ -10,7 +10,7 @@ var DEFAULT_UGLIFY_OPTIONS = {
   // TODO: determine default options
 };
 
-function UglifyMinifier(asset, context, done) {
+function UglifyJSMinifier(asset, context, done) {
   var options = context.minify;
   if ('object' === typeof options) {
     options = _extend(_extend({}, DEFAULT_UGLIFY_OPTIONS), options);
@@ -27,5 +27,5 @@ function UglifyMinifier(asset, context, done) {
   done();
 }
 
-module.exports = UglifyMinifier;
+module.exports = UglifyJSMinifier;
 

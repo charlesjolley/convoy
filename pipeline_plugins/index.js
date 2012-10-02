@@ -16,6 +16,8 @@
 
   e.SimpleMergeLinker    = require('./simple_merge_linker');
   e.CommonJSLinker       = require('./commonjs_linker');
+  e.CSSLinker            = require('./css_linker');
 
-  e.UglifyMinifier       = require('./uglify_minifier');
+  e.UglifyJSMinifier     = require('./uglify_js_minifier');
+  e.UglifyCSSMinifier    = require('./uglify_css_minifier');
 })(exports);
