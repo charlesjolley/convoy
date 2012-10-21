@@ -11,6 +11,8 @@ var UGLIFY = require('uglify-js');
 var DIRNAME       = path.dirname(module.filename);
 var FIXTURES_PATH = path.resolve(DIRNAME, '..', '..', 'fixtures');
 
+var existsSync = fs.existsSync || path.existsSync;
+
 /**
  * Returns path to an object within the fixtures directory. Works just like
  * resolve().
@@ -62,7 +64,7 @@ exports.tmpfile = function() {
  * Ensures the passed directories exist, creating them if needed
  */
 exports.mkdirSync_p = function(p) {
-  if (path.existsSync(p)) {
+  if (existsSync(p)) {
     if (!fs.statSync(p).isDirectory()) {
       throw new Error(p + ' is not a directory');
     }

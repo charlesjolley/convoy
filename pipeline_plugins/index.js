@@ -18,6 +18,8 @@
   e.CommonJSLinker       = require('./commonjs_linker');
   e.CSSLinker            = require('./css_linker');
 
+  // maintain compatibility
+  e.UglifyMinifier       = require('./uglify_js_minifier');
   e.UglifyJSMinifier     = require('./uglify_js_minifier');
   e.UglifyCSSMinifier    = require('./uglify_css_minifier');
 })(exports);

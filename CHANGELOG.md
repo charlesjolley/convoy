@@ -1,3 +1,8 @@
+# v0.4.0
+  * Eliminated a few errors with newer versions of node.
+  * Added support for minifying CSS using the UglifyCSSMinifier.
+  * Fixed a bug with middleware when dealing with UTF8 files.
+  
 # v0.3.2
   * Better reporting when modules are not found.
   * Expanded list of excepted modules

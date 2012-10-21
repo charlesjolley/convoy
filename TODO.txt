@@ -2,3 +2,4 @@
 - Select compiler/preprocessor for each source file based on config in local
   package.
 - Figure out how to add assets from packages.
+- Do a better job of detecting requires that are combined from code.

@@ -39,8 +39,7 @@ function CSSLinker(asset, context, done) {
     ASYNC.map(expanded, function(asset, next) {
       var id = asset.id, opts, body;
 
-      body = asset.body +
-        '\n/*@ sourceURL=' + id + '*/\n';
+      body = asset.body;
 
       if (asset.aliasId) {
         id = asset.aliasId;

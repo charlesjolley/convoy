@@ -146,7 +146,7 @@ describe('[unit] asset_copier', function() {
 
       inst.findPaths(function(err, paths) {
         if (err) return done(err);
-        paths.should.eql(expected);
+        paths.sort().should.eql(expected);
         done();
       });
     });

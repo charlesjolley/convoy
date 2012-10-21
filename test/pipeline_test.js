@@ -9,6 +9,9 @@ var lib = h.lib;
 var FS  = require('fs');
 var PATH = require('path');
 
+// compatibility with older verions of node
+var existsSync = FS.existsSync || PATH.existsSync;
+
 RegExp.escape = function(text) {
     return text.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, "\\$&");
 };
@@ -83,7 +86,7 @@ describe('[unit] pipeline', function() {
       h.mkdirSync_p(buildir);
       inst.writeFile('app.js', buildir, function(err) {
         if (err) return done(err);
-        PATH.existsSync(path).should.equal(true);
+        existsSync(path).should.equal(true);
         testmodules(FS.readFileSync(path, 'utf8'),
           'jquery/lib/jquery',
           'ember/view',
@@ -104,7 +107,7 @@ describe('[unit] pipeline', function() {
       h.mkdirSync_p(buildir);
       inst.writeFile('app.css', buildir, function(err) {
         if (err) return done(err);
-        PATH.existsSync(path).should.equal(true);
+        existsSync(path).should.equal(true);
         testcss(FS.readFileSync(path, 'utf8'),
           'bootstrap/styles/reset/type',
           'bootstrap/styles/reset/body',
@@ -122,7 +125,7 @@ describe('[unit] pipeline', function() {
       var path = PATH.resolve(buildir, 'built_assets/index.html');
       inst.writeFile('built_assets/index.html', buildir, function(err) {
         if (err) return done(err);
-        PATH.existsSync(path).should.equal(true, path);
+        existsSync(path).should.equal(true, path);
         done();
       });
     });
@@ -142,7 +145,7 @@ describe('[unit] pipeline', function() {
           'built_assets/index.html', 
           'built_assets/images/a.png', 
         'built_assets/images/b.png'].forEach(function(file) {
-          PATH.existsSync(PATH.resolve(buildir, file)).should.equal(true, file);
+          existsSync(PATH.resolve(buildir, file)).should.equal(true, file);
         });
         done();
       });
@@ -164,7 +167,7 @@ describe('[unit] pipeline', function() {
       inst.writeAll(buildir, function(err) {
         if (err) return done(err);
         ['index.html', 'images/a.png', 'images/b.png'].forEach(function(file) {
-          PATH.existsSync(PATH.resolve(buildir, file)).should.equal(true, file);
+          existsSync(PATH.resolve(buildir, file)).should.equal(true, file);
         });
         done();
       });
