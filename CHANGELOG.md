@@ -1,3 +1,6 @@
+# v0.4.1
+  * Switched to node-detective to parse JS.
+  
 # v0.4.0
   * Eliminated a few errors with newer versions of node.
   * Added support for minifying CSS using the UglifyCSSMinifier.
