@@ -3,7 +3,7 @@
  * @copyright 2012 Charles Jolley
  */
 
-var UGLIFY = require('uglify-js');
+var DETECTIVE = require('detective');
 var PATH = require('path');
 
 // modules found here are skipped as requirements. Mostly this includes the 
@@ -17,37 +17,18 @@ var EXCEPTIONS = {
 };
 
 function _extractRequiredModules(asset) {
-  var ast, results = [],
-    walker = UGLIFY.uglify.ast_walker();
+  var ast, filteredResults = [], results = [];
 
-  try {
-    ast = UGLIFY.parser.parse(asset.body);
-  } catch(e) {
-    var se = new SyntaxError(e.message);
-    se.file = asset.path;
-    se.line = e.line + 1;
-    se.col  = e.col;
-    se.pos  = e.pos;
-    throw se;
-  }
+  results = DETECTIVE(asset.body);
+  filteredResults = results.filter(function(moduleId) {
+    var exceptions = asset.pkg && EXCEPTIONS[asset.pkg.name];
+    var isException = 
+        EXCEPTIONS.__node[moduleId] || EXCEPTIONS.__narwhal[moduleId] ||
+        (exceptions && exceptions[moduleId]);
+    return (!isException);
+  });
 
-  function handleExpr(expr, args) {
-    if (expr[0] === 'name' && expr[1] === 'require') {
-      var moduleId = args[0][1];
-      var exceptions = asset.pkg && EXCEPTIONS[asset.pkg.name];
-      var isException = 
-          EXCEPTIONS.__node[moduleId] || EXCEPTIONS.__narwhal[moduleId] ||
-          (exceptions && exceptions[moduleId]); 
-      if (!isException) results.push(moduleId);
-    }
-  }
-
-  walker.with_walkers({
-    "new": handleExpr,
-    "call": handleExpr
-  }, function() { return walker.walk(ast); });
-
-  return results;
+  return filteredResults;
 }
 
 // inspects files for require statements
